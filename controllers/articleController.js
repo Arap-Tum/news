@@ -5,6 +5,10 @@ const path = require("path");
 
 // CREATE
 exports.createArticle = async (req, res) => {
+  if (!req.body.title || !req.body.content || !req.body.authorId) {
+    return res.status(400).json({ error: "Title, content, and authorId are required" });
+  }
+
   try {
     const { title, content, authorId, categoryId } = req.body;
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
@@ -22,7 +26,12 @@ exports.createArticle = async (req, res) => {
     res.status(201).json(article);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to create article" });
+
+    res.status(500).json({
+    error: "Failed to create article",
+    message: error.message,         // this gives the actual error message
+    stack: error.stack,             // optional: includes stack trace for dev
+  });
   }
 };
 
