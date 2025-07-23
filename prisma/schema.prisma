@@ -15,13 +15,14 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
+  id        Int    @id @default(autoincrement())
   name      String
   email     String    @unique
   password  String
   role      String    @default("author")
-  articles  Article[]
+  articles  Article[] //one to many with Article
   createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
 }
 
 model Article {
