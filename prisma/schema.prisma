@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -20,9 +14,8 @@ model User {
   email     String    @unique
   password  String
   role      String    @default("author")
-  articles  Article[] //one to many with Article
   createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
+  articles  Article[]
 }
 
 model Article {
@@ -34,6 +27,8 @@ model Article {
   categoryId Int?
   author     User     @relation(fields: [authorId], references: [id])
   authorId   String
+  isTrending Boolean  @default(false)
+  isFeatured Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }

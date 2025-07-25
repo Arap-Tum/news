@@ -7,8 +7,8 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const userRoutes = require("./routes/userRoutes");
 
 app.use(cors());
-// app.use(express.json()); // to parse JSON bodies
-// app.use(express.urlencoded({ extended: true })); // to parse URL-encoded bodies
+app.use(express.json()); // to parse JSON bodies
+app.use(express.urlencoded({ extended: true })); // to parse URL-encoded bodies
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // serve static files from uploads directory
 app.use("/static", express.static(path.join(__dirname, "public"))); // serve static files from public directory
