@@ -5,13 +5,20 @@ const path = require("path");
 
 // CREATE
 exports.createArticle = async (req, res) => {
+
+   console.log("req.file:", req.file);
+  console.log("req.body:", req.body);
+
+  // Check if file is uploaded
+ 
+  // Validate required fields
   if (!req.body.title || !req.body.content || !req.body.authorId) {
     return res.status(400).json({ error: "Title, content, and authorId are required" });
   }
 
   try {
     const { title, content, authorId, categoryId } = req.body;
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
     const article = await prisma.article.create({
       data: {
