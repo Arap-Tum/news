@@ -1,15 +1,16 @@
 const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient();
-const fs = require("fs");
-const path = require("path");
+
+
+const{
+   processImage, uploadImageToCloudinary, extractPublicId, deleteImageFromCloudinary
+} = require('../middlewares/imageProcessor.js');
 
 // CREATE
 exports.createArticle = async (req, res) => {
 
    console.log("req.file:", req.file);
   console.log("req.body:", req.body);
-
-  // Check if file is uploaded
  
   // Validate required fields
   if (!req.body.title || !req.body.content || !req.body.authorId) {
@@ -18,8 +19,12 @@ exports.createArticle = async (req, res) => {
 
   try {
     const { title, content, authorId, categoryId } = req.body;
-const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
-
+let imageUrl = null;
+if (req.file) {
+  const processed = await processImage(req.file.buffer);
+  const result = await uploadImageToCloudinary(processed.buffer);
+  imageUrl = result.secure_url; // This is the actual image URL from Cloudinary
+}
     const article = await prisma.article.create({
       data: {
         title,
@@ -75,17 +80,29 @@ exports.updateArticle = async (req, res) => {
   const { id } = req.params;
   const { title, content, categoryId } = req.body;
   try {
-    const oldArticle = await prisma.article.findUnique({ where: { id } });
-    if (!oldArticle) return res.status(404).json({ error: "Not found" });
+    const oldArticle = await prisma.article.findUnique({ where: { id: parseInt(id) } });
+    if (!oldArticle) return res.status(404).json({ error: "Article not found" });
+
 
     let imageUrl = oldArticle.imageUrl;
+
+    // Process new image if provided
     if (req.file) {
-      if (imageUrl) fs.unlinkSync(path.join(__dirname, "..", imageUrl));
-      imageUrl = `/uploads/${req.file.filename}`;
+        // Delete the old image from Cloudinary (if it exists)
+      if (imageUrl) {
+        const oldPublicId = extractPublicId(imageUrl);
+        await deleteImageFromCloudinary(oldPublicId);
+      }
+
+       // Process and upload the new image
+      const processed = await processImage(req.file.buffer);
+      const uploadResult = await uploadImageToCloudinary(processed.buffer);
+      imageUrl = uploadResult.secure_url;
     }
 
+    // Update article in the DB
     const updated = await prisma.article.update({
-      where: { id },
+      where: { id: parseInt(id) },
       data: {
         title,
         content,
@@ -96,25 +113,30 @@ exports.updateArticle = async (req, res) => {
 
     res.json(updated);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Update failed" });
+ console.error("❌ Error updating article:", err);
+    res.status(500).json({ error: "Update failed", message: err.message });
   }
 };
 
 // DELETE
 exports.deleteArticle = async (req, res) => {
   const { id } = req.params;
+
   try {
-    const article = await prisma.article.findUnique({ where: { id } });
+    const article = await prisma.article.findUnique({ where: { id: parseInt(id) } });
     if (!article) return res.status(404).json({ error: "Not found" });
 
+    // Delete Cloudinary image if it exists
     if (article.imageUrl) {
-      fs.unlinkSync(path.join(__dirname, "..", article.imageUrl));
+      const publicId = extractPublicId(article.imageUrl);
+      await deleteImageFromCloudinary(publicId);
     }
 
-    await prisma.article.delete({ where: { id } });
+    await prisma.article.delete({ where: { id: parseInt(id) } });
     res.json({ message: "Article deleted" });
   } catch (err) {
-    res.status(500).json({ error: "Delete failed" });
+    console.error("❌ Error deleting article:", err);
+    res.status(500).json({ error: "Delete failed", message: err.message });
   }
 };
+
