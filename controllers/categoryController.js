@@ -19,7 +19,7 @@ exports.createCategory = async (req, res) => {
 // Get all categories
 exports.getAllCategories = async (req, res) => {
   try {
-    const categories = await prisma.category.findMany();
+    const categories = await prisma.category.findMany({include: { articles: true } });
     res.json(categories);
   } catch (error) {
     res.status(500).json({

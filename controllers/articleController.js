@@ -18,7 +18,7 @@ exports.createArticle = async (req, res) => {
   }
 
   try {
-    const { title, content, authorId, categoryId } = req.body;
+    const { title, content, authorId, categoryId, isTrending , isFeatured} = req.body;
 let imageUrl = null;
 if (req.file) {
   const processed = await processImage(req.file.buffer);
@@ -31,6 +31,8 @@ if (req.file) {
         content,
         imageUrl,
         authorId,
+        isTrending,
+        isFeatured,
         categoryId: categoryId ? parseInt(categoryId) : undefined,
       },
     });
@@ -78,7 +80,7 @@ exports.getArticleById = async (req, res) => {
 // UPDATE
 exports.updateArticle = async (req, res) => {
   const { id } = req.params;
-  const { title, content, categoryId } = req.body;
+  const { title, content, categoryId, isTrending, isFeatured } = req.body;
   try {
     const oldArticle = await prisma.article.findUnique({ where: { id: parseInt(id) } });
     if (!oldArticle) return res.status(404).json({ error: "Article not found" });
@@ -108,6 +110,8 @@ exports.updateArticle = async (req, res) => {
         content,
         categoryId: categoryId ? parseInt(categoryId) : undefined,
         imageUrl,
+        isTrending,
+        isFeatured,
       },
     });
 
