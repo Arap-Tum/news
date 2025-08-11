@@ -62,6 +62,24 @@ exports.getAllArticles = async (req, res) => {
   }
 };
 
+//Read by Author
+exports.getMyArticles = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const articles = await prisma.article.findMany({
+      where: {
+        authorId: userId,
+      },
+    });
+
+    res.json(articles);
+  } catch (error) {
+    console.error("Failed to fetch user articles:", error);
+    res.status(500).json({ error: "Failed to fetch your articles" });
+  }
+};
+
 // READ ONE
 exports.getArticleById = async (req, res) => {
   const { id } = req.params;
@@ -82,8 +100,12 @@ exports.updateArticle = async (req, res) => {
   const { id } = req.params;
   const { title, content, categoryId, isTrending, isFeatured } = req.body;
   try {
-    const oldArticle = await prisma.article.findUnique({ where: { id: parseInt(id) } });
-    if (!oldArticle) return res.status(404).json({ error: "Article not found" });
+ const oldArticle = await prisma.article.findUnique({
+    where: {
+      id: String(id), // ✅ use the actual value, not the String function
+    },
+  });
+  if (!oldArticle) return res.status(404).json({ error: "Article not found" });
 
 
     let imageUrl = oldArticle.imageUrl;
