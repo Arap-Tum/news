@@ -11,9 +11,9 @@ const {  createArticle,  getAllArticles, getArticleById,  updateArticle, deleteA
 router.get("/my-articles", requireAuth, getMyArticles);
 
 router.post("/", upload.single("image"), createArticle);
-router.get("/",  getAllArticles);
-router.get("/:id",  getArticleById);
-router.put("/:id", upload.single("image"), updateArticle);
-router.delete("/:id",  deleteArticle);
+router.get("/",  requireAuth, getAllArticles);
+router.get("/:id",  requireAuth, getArticleById);
+router.put("/:id", requireAuth, upload.single("image"), updateArticle);
+router.delete("/:id", requireAuth, deleteArticle);
 
 module.exports = router;

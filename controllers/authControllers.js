@@ -77,3 +77,30 @@ exports.login = async (req, res) => {
         res.status(500).json({ error: "Failed to login", message: error.message });
     }
 }
+
+exports.updatePassword = async (req, res) => {
+  try {
+    // 1️⃣ Get user ID from JWT (set by your auth middleware)
+    const userId = req.user.id;  
+
+    // 2️⃣ Get new password from request body
+    const { password } = req.body;
+    if (!password) {
+      return res.status(400).json({ error: "Password is required" });
+    }
+
+    // 3️⃣ Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 4️⃣ Update in DB
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword }
+    });
+
+    res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error updating password:", error.message);
+    res.status(500).json({ error: "Failed to update password" });
+  }
+};

@@ -9,10 +9,15 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
-// if (!pool) {
-//   console.log('Failed to connect to the database ')
-// } else {
-//   console.log('Connected to the database succesfully')
-// }
+//Test the connection 
+(async () => {
+  try {
+     const client = await pool.connect();
+    console.log("✅ Connected to the database successfully");
+    client.release(); // release connection back to pool
+  } catch (error) {
+    console.error("❌ Failed to connect to the database:", err.message);
+  }
+})
 
 module.exports = pool;

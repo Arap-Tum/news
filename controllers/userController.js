@@ -72,15 +72,53 @@ exports.updateUser = async (req, res) => {
 // Delete a user
 exports.deleteUser = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params; //user to delete
+    const { transferId } = req.body; // new owner ID
+
+
+
+    if (transferId) {
+      //Ensure the new owner exists 
+      const newOner = await prisma.user.findUnique(
+        {
+          where: {id: transferId}
+        }
+      );
+
+      if (!newOner) {
+        return res.status(400).json({
+          error: 'Invalid transferId',
+          message: 'User for tansfer does not exist'
+        })
+      };
+
+      //transfer all articles to new user 
+      const transferResult = await prisma.article.updateMany({
+     where: { authorId: id },
+        data: { authorId: transferId }
+    });
+
+          console.log(`✅ Transferred ${transferResult.count} articles to user ${transferId}`);
+
+    } else {
+     // Delete all articles from user
+      const deleteResult = await prisma.article.deleteMany({
+        where: { authorId: id }
+      });
+      console.log(`🗑️ Deleted ${deleteResult.count} articles from user ${id}`);
+    }
+    //Now delete the user
     await prisma.user.delete({
       where: { id },
-    });
-    res.json({ message: "User deleted" });
+    })
+    
+    res.json({ message: "User deleted successfully" });
   } catch (error) {
     res.status(500).json({
       error: "Failed to delete user",
       message: error.message,
     });
+
+    console.log("Error message:", error.message);
   }
 };
