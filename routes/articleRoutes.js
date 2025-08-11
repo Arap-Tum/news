@@ -8,7 +8,7 @@ const {  createArticle,  getAllArticles, getArticleById,  updateArticle, deleteA
 
 
 // ✅ New route to get logged-in user's articles
-router.get("/my-articles", getMyArticles);
+router.get("/my-articles", requireAuth, getMyArticles);
 
 router.post("/", upload.single("image"), createArticle);
 router.get("/",  getAllArticles);
