@@ -5,9 +5,9 @@ const storage = multer.memoryStorage(); // Use memory storage for image processi
 
 const upload = multer({
   storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // Limit file size to 5MB
-  },
+  // limits: {
+  //   fileSize: 5 * 1024 * 1024, // Limit file size to 5MB
+  // },
   fileFilter: (req, file, cb) => {
     const filetypes = /jpeg|jpg|png|gif/; // Allowed file types
     const mimetype = filetypes.test(file.mimetype);
@@ -24,14 +24,3 @@ const upload = multer({
 module.exports = upload;
 
 
-// const storage = multer.diskStorage({
-//   destination: "uploads/",
-//   filename: (req, file, cb) => {
-//     const ext = path.extname(file.originalname);
-//     const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
-//     cb(null, uniqueName);
-//   },
-// });
-
-// const upload = multer({ storage });
-// module.exports = upload;

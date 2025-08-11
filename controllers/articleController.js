@@ -98,12 +98,10 @@ exports.getArticleById = async (req, res) => {
 // UPDATE
 exports.updateArticle = async (req, res) => {
   const { id } = req.params;
-  const { title, content, categoryId, isTrending, isFeatured } = req.body;
+  const { title, content, categoryId, isTrending, authorId, isFeatured } = req.body;
   try {
  const oldArticle = await prisma.article.findUnique({
-    where: {
-      id: String(id), // ✅ use the actual value, not the String function
-    },
+    where: {id },
   });
   if (!oldArticle) return res.status(404).json({ error: "Article not found" });
 
@@ -126,12 +124,13 @@ exports.updateArticle = async (req, res) => {
 
     // Update article in the DB
     const updated = await prisma.article.update({
-      where: { id: parseInt(id) },
+      where: { id: (id) },
       data: {
         title,
         content,
         categoryId: categoryId ? parseInt(categoryId) : undefined,
         imageUrl,
+        authorId,
         isTrending,
         isFeatured,
       },
@@ -149,7 +148,7 @@ exports.deleteArticle = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const article = await prisma.article.findUnique({ where: { id: parseInt(id) } });
+    const article = await prisma.article.findUnique({ where: { id} });
     if (!article) return res.status(404).json({ error: "Not found" });
 
     // Delete Cloudinary image if it exists
@@ -158,7 +157,7 @@ exports.deleteArticle = async (req, res) => {
       await deleteImageFromCloudinary(publicId);
     }
 
-    await prisma.article.delete({ where: { id: parseInt(id) } });
+    await prisma.article.delete({ where: {id} });
     res.json({ message: "Article deleted" });
   } catch (err) {
     console.error("❌ Error deleting article:", err);

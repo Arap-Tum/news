@@ -102,13 +102,28 @@ const deleteImageFromCloudinary = async (publicId) => {
 //Extract public ID from URL
 const extractPublicId = (url) => {
   try {
-    const fileName = path.basename(url); // requires: const path = require('path');
-    return fileName.split('.')[0];
+    // Remove query params if present
+    const cleanUrl = url.split('?')[0];
+
+    // Break into parts
+    const parts = cleanUrl.split('/');
+
+    // Find the index of 'upload' and take everything after it (skip version part)
+    const uploadIndex = parts.indexOf('upload');
+    if (uploadIndex === -1 || uploadIndex + 2 > parts.length) {
+      throw new Error('Invalid Cloudinary URL format');
+    }
+
+    // The public ID is the folder + filename without extension
+    const publicIdWithExt = parts.slice(uploadIndex + 2).join('/'); // news/filename.jpg
+    return publicIdWithExt.replace(/\.[^/.]+$/, ''); // remove extension
   } catch (error) {
     console.error("❌ Error extracting public ID from URL:", error);
     throw new Error('Public ID extraction failed');
   }
-}
+};
+
+
 
 
 module.exports = {
