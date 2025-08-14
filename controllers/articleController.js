@@ -31,8 +31,8 @@ if (req.file) {
         content,
         imageUrl,
         authorId,
-        isTrending,
-        isFeatured,
+         isTrending: req.body.isTrending === 'true',  // convert string to boolean
+    isFeatured: req.body.isFeatured === 'true',
         categoryId: categoryId ? parseInt(categoryId) : undefined,
       },
     });
@@ -126,13 +126,13 @@ exports.updateArticle = async (req, res) => {
     const updated = await prisma.article.update({
       where: { id: (id) },
       data: {
-        title,
-        content,
-        categoryId: categoryId ? parseInt(categoryId) : undefined,
-        imageUrl,
-        authorId,
-        isTrending,
-        isFeatured,
+       title: req.body.title,
+    content: req.body.content,
+    categoryId: Number(req.body.categoryId),
+    imageUrl,
+    authorId: req.user.userId,
+    isTrending: req.body.isTrending === "true",
+    isFeatured: req.body.isFeatured === "true",
       },
     });
 

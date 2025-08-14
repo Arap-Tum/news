@@ -10,9 +10,9 @@ const {  createArticle,  getAllArticles, getArticleById,  updateArticle, deleteA
 // ✅ New route to get logged-in user's articles
 router.get("/my-articles", requireAuth, getMyArticles);
 
-router.post("/", upload.single("image"), createArticle);
+router.post("/", requireAuth, upload.single("image"), createArticle);
 router.get("/",   getAllArticles);
-router.get("/:id",  requireAuth, getArticleById);
+router.get("/:id",  getArticleById);
 router.put("/:id", requireAuth, upload.single("image"), updateArticle);
 router.delete("/:id", requireAuth, deleteArticle);
 
