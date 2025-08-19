@@ -35,7 +35,7 @@ app.get("/", (req, res) => {
 /// Schedule a task to run every 14 minutes
 cron.schedule('*/14 * * * *', function() {
   console.log('Pinging self to stay awake...');
-  https.get('https://your-app.onrender.com', (resp) => {
+  https.get('https://news-72me.onrender.com', (resp) => {
     let data = '';
     resp.on('data', (chunk) => { data += chunk; });
     resp.on('end', () => { console.log('Self-ping successful'); });
