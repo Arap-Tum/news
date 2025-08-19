@@ -2,6 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const path = require("path");
+const cron = require('node-cron');
+const https = require('https');
+
 
 
 const articleRoutes = require("./routes/articleRoutes");
@@ -29,7 +32,19 @@ app.get("/", (req, res) => {
     res.send("Welcome to the News API");
 });     
 
-const PORT = process.env.PORT || 5000;
+/// Schedule a task to run every 14 minutes
+cron.schedule('*/14 * * * *', function() {
+  console.log('Pinging self to stay awake...');
+  https.get('https://your-app.onrender.com', (resp) => {
+    let data = '';
+    resp.on('data', (chunk) => { data += chunk; });
+    resp.on('end', () => { console.log('Self-ping successful'); });
+  }).on("error", (err) => {
+    console.log("Error while self-pinging: " + err.message);
+  });
+});
+
+const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
