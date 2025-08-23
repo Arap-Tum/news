@@ -36,7 +36,9 @@ exports.register = async (req, res) => {
         },
         });
 
-        res.status(201).json(user);
+         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '5h' });
+
+        res.status(201).json({ user, token });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to register user", message: error.message });
@@ -69,7 +71,7 @@ exports.login = async (req, res) => {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '5h' });
 
         res.json({ message: "Login successful", token, user});
     } catch (error) {
