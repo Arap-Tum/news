@@ -1,23 +1,24 @@
 const express = require("express");
+const dotenv = require("dotenv");
+dotenv.config();
+
 const cors = require("cors");
 const app = express();
 const path = require("path");
 const cron = require('node-cron');
 const https = require('https');
 
-/**
- * Configuring the news api 
- */
-// const fetch = require('node-fetch');
-const dotenv = require("dotenv");
-dotenv.config();
+
+const connectDB = require("./config/mongoDb"); // connect to MongoDB
+
+connectDB(); 
 
 
 const articleRoutes = require("./routes/articleRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
-
+const newsRoute = require("./routes/news")
 
 app.use(cors());
 app.use(express.json()); // to parse JSON bodies
@@ -32,6 +33,11 @@ app.use("/api/articles", articleRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
+
+// Scraped news routes
+app.use("/api/scraped", newsRoute);
+
+
 
 /*
  Proxy endpoint  to nes API 
@@ -56,13 +62,22 @@ app.get("/api/news", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch news" });
   }
 });
-
-
 //============================================
 
 app.get("/", (req, res) => {
     res.send("Welcome to the News API");
 });     
+
+//=============================================
+
+// Start cron job(s)
+require("./jobs/scheduler");
+
+// Start cleanup job(s)
+require("./jobs/newCleaning");
+
+
+//============================================
 
 /// Schedule a task to run every 14 minutes
 cron.schedule('*/14 * * * *', function() {

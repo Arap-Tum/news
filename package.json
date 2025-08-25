@@ -13,16 +13,22 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^6.12.0",
+    "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
+    "cheerio": "^1.1.2",
     "cloudinary": "^2.7.0",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.0",
+    "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "fast-xml-parser": "^5.2.5",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.17.2",
     "multer": "^2.0.2",
     "node-cron": "^4.2.1",
     "node-fetch": "^3.3.2",
     "pg": "^8.16.3",
+    "puppeteer": "^24.17.0",
+    "rss-parser": "^3.13.0",
     "sharp": "^0.34.3"
   },
   "devDependencies": {
