@@ -1,6 +1,6 @@
 // scheduler/aljazeeraScheduler.js
 const cron = require("node-cron");
-const { scrapeAljazeeraNews } = require("../scrapers/aljazeera");
+// const { scrapeAljazeeraNews } = require("../scrapers/aljazeera");
 const { scrapeStandardPolitics } = require("../scrapers/standard");
 const Article = require("../models/scrapedArticle");
 
@@ -10,8 +10,8 @@ async function startScheduler() {
   // Run immediately on startup
   await runAllScrapers();
 
-  // Run every 8 hours
-  cron.schedule("0 */8 * * *", async () => {
+  // Run every 4 hours
+  cron.schedule("0 */4 * * *", async () => {
     console.log("⏰ Running scheduled scrapers...");
     await runAllScrapers();
   });
@@ -19,11 +19,11 @@ async function startScheduler() {
 
 async function runAllScrapers() {
   try {
-    const aljazeeraArticles = await scrapeAljazeeraNews();
+    // const aljazeeraArticles = await scrapeAljazeeraNews();
     const standardArticles = await scrapeStandardPolitics();
 
     // Merge all scraped articles
-    const allArticles = [...aljazeeraArticles, ...standardArticles];
+    const allArticles = [ ...standardArticles];
 
     if (allArticles.length === 0) {
       console.log("⚠️ No articles scraped this round.");
