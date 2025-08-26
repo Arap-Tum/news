@@ -19,6 +19,7 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const newsRoute = require("./routes/news")
+const serviceRoute = require('./servicess')
 
 app.use(cors());
 app.use(express.json()); // to parse JSON bodies
@@ -34,8 +35,13 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 
+
+
 // Scraped news routes
 app.use("/api/scraped", newsRoute);
+
+//FEtch api
+app.use("/api/services", serviceRoute);
 
 
 

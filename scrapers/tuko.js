@@ -6,7 +6,7 @@ const parser = new Parser();
 
 async function tukoNews() {
   try {
-    const feed = await parser.parseURL("https://www.kenyans.co.ke/feeds/news?_wrapper_format=html");
+    const feed = await parser.parseURL("https://www.kenyans.co.ke/feeds/news");
 
     // Map RSS items to your schema
     const articles = await Promise.all(
@@ -48,7 +48,7 @@ async function tukoNews() {
 
     return articles;
   } catch (error) {
-    console.error("❌ Error scraping RSS:", error.message);
+    console.error("❌ Error scraping TUKO RSS:", error.message);
     return [];
   }
 }
