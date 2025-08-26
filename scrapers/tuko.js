@@ -4,9 +4,9 @@ const cheerio = require("cheerio");
 
 const parser = new Parser();
 
-async function scrapeStandardPolitics() {
+async function tukoNews() {
   try {
-    const feed = await parser.parseURL("https://www.standardmedia.co.ke/rss/politics.php");
+    const feed = await parser.parseURL("https://www.kenyans.co.ke/feeds/news?_wrapper_format=html");
 
     // Map RSS items to your schema
     const articles = await Promise.all(
@@ -36,15 +36,15 @@ async function scrapeStandardPolitics() {
           description: item.contentSnippet || item.summary || "",
           content,
           image: imageUrl,
-          category: "Politics",
+          category: "kenya",
           date: item.pubDate ? new Date(item.pubDate) : new Date(),
-          source: "Standard Media",
+          source: "tuko",
           url: item.link,
         };
       })
     );
     
- console.log(`✅ Scraped ${articles.length} articles from Stndad media`);
+ console.log(`✅ Scraped ${articles.length} articles from tuko`);
 
     return articles;
   } catch (error) {
@@ -58,4 +58,4 @@ async function scrapeStandardPolitics() {
 //   console.log("✅ Scraped Articles:", articles.slice(0, 2)); // show first 2
 // });
 
-module.exports = { scrapeStandardPolitics };
+module.exports = { tukoNews };

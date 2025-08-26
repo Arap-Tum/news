@@ -2,6 +2,8 @@
 const cron = require("node-cron");
 // const { scrapeAljazeeraNews } = require("../scrapers/aljazeera");
 const { scrapeStandardPolitics } = require("../scrapers/standard");
+const {tukoNews}= require('../scrapers/tuko')
+
 const Article = require("../models/scrapedArticle");
 
 async function startScheduler() {
@@ -21,9 +23,10 @@ async function runAllScrapers() {
   try {
     // const aljazeeraArticles = await scrapeAljazeeraNews();
     const standardArticles = await scrapeStandardPolitics();
+    const tukoArticles = await tukoNews();
 
     // Merge all scraped articles
-    const allArticles = [ ...standardArticles];
+    const allArticles = [ ...standardArticles, ...tukoArticles];
 
     if (allArticles.length === 0) {
       console.log("⚠️ No articles scraped this round.");
