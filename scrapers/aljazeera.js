@@ -4,6 +4,8 @@ async function scrapeAljazeeraNews() {
   const browser = await puppeteer.launch({
     headless: true, // or false for debugging
     // no need for executablePath if using puppeteer (bundled Chromium)
+     executablePath: process.env.CHROME_PATH || "/usr/bin/google-chrome", // common path on Linux servers
+  args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   const page = await browser.newPage();
 
