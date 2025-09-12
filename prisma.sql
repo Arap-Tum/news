@@ -24,7 +24,6 @@ enum UserRole {
 model User {
   id        String    @id @default(uuid())
   name      String
-  
   email     String    @unique
   password  String
   role      String    @default("author")
@@ -73,3 +72,10 @@ model County {
   name      String    @unique   // e.g. Nandi, Uasin Gishu, Nakuru
   articles  Article[]
 }
+
+
+
+-- npx prisma migrate diff \
+  --from-schema-datasource prisma/schema.prisma \
+  --to-schema-datamodel prisma/schema.prisma \
+  --script > prisma/migrations/baseline/migration.sql

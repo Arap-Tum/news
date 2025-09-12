@@ -1,38 +1,53 @@
-const { PrismaClient } = require('../generated/prisma');
+const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
 
-
-const{
-   processImage, uploadImageToCloudinary, extractPublicId, deleteImageFromCloudinary
-} = require('../middlewares/imageProcessor.js');
+const {
+  processImage,
+  uploadImageToCloudinary,
+  extractPublicId,
+  deleteImageFromCloudinary,
+} = require("../middlewares/imageProcessor.js");
 
 // CREATE
 exports.createArticle = async (req, res) => {
+  //  console.log("req.file:", req.file);
+  // console.log("req.body:", req.body);
 
-   console.log("req.file:", req.file);
-  console.log("req.body:", req.body);
- 
   // Validate required fields
   if (!req.body.title || !req.body.content || !req.body.authorId) {
-    return res.status(400).json({ error: "Title, content, and authorId are required" });
+    return res
+      .status(400)
+      .json({ error: "Title, content, and authorId are required" });
   }
 
   try {
-    const { title, content, authorId, categoryId, isTrending , isFeatured} = req.body;
-let imageUrl = null;
-if (req.file) {
-  const processed = await processImage(req.file.buffer);
-  const result = await uploadImageToCloudinary(processed.buffer);
-  imageUrl = result.secure_url; // This is the actual image URL from Cloudinary
-}
+    const {
+      title,
+      subtitle,
+      excerpt,
+      slung,
+      content,
+      authorId,
+      categoryId,
+      isTrending,
+      isFeatured,
+      verificationStatus,
+      countyId,
+    } = req.body;
+    let imageUrl = null;
+    if (req.file) {
+      const processed = await processImage(req.file.buffer);
+      const result = await uploadImageToCloudinary(processed.buffer);
+      imageUrl = result.secure_url; // This is the actual image URL from Cloudinary
+    }
     const article = await prisma.article.create({
       data: {
         title,
         content,
         imageUrl,
         authorId,
-         isTrending: req.body.isTrending === 'true',  // convert string to boolean
-    isFeatured: req.body.isFeatured === 'true',
+        isTrending: req.body.isTrending === "true", // convert string to boolean
+        isFeatured: req.body.isFeatured === "true",
         categoryId: categoryId ? parseInt(categoryId) : undefined,
       },
     });
@@ -42,10 +57,10 @@ if (req.file) {
     console.error(error);
 
     res.status(500).json({
-    error: "Failed to create article",
-    message: error.message,         // this gives the actual error message
-    stack: error.stack,             // optional: includes stack trace for dev
-  });
+      error: "Failed to create article",
+      message: error.message, // this gives the actual error message
+      stack: error.stack, // optional: includes stack trace for dev
+    });
   }
 };
 
@@ -98,25 +113,26 @@ exports.getArticleById = async (req, res) => {
 // UPDATE
 exports.updateArticle = async (req, res) => {
   const { id } = req.params;
-  const { title, content, categoryId, isTrending, authorId, isFeatured } = req.body;
+  const { title, content, categoryId, isTrending, authorId, isFeatured } =
+    req.body;
   try {
- const oldArticle = await prisma.article.findUnique({
-    where: {id },
-  });
-  if (!oldArticle) return res.status(404).json({ error: "Article not found" });
-
+    const oldArticle = await prisma.article.findUnique({
+      where: { id },
+    });
+    if (!oldArticle)
+      return res.status(404).json({ error: "Article not found" });
 
     let imageUrl = oldArticle.imageUrl;
 
     // Process new image if provided
     if (req.file) {
-        // Delete the old image from Cloudinary (if it exists)
+      // Delete the old image from Cloudinary (if it exists)
       if (imageUrl) {
         const oldPublicId = extractPublicId(imageUrl);
         await deleteImageFromCloudinary(oldPublicId);
       }
 
-       // Process and upload the new image
+      // Process and upload the new image
       const processed = await processImage(req.file.buffer);
       const uploadResult = await uploadImageToCloudinary(processed.buffer);
       imageUrl = uploadResult.secure_url;
@@ -124,21 +140,21 @@ exports.updateArticle = async (req, res) => {
 
     // Update article in the DB
     const updated = await prisma.article.update({
-      where: { id: (id) },
+      where: { id: id },
       data: {
-       title: req.body.title,
-    content: req.body.content,
-    categoryId: Number(req.body.categoryId),
-    imageUrl,
-    authorId: req.user.userId,
-    isTrending: req.body.isTrending === "true",
-    isFeatured: req.body.isFeatured === "true",
+        title: req.body.title,
+        content: req.body.content,
+        categoryId: Number(req.body.categoryId),
+        imageUrl,
+        authorId: req.user.userId,
+        isTrending: req.body.isTrending === "true",
+        isFeatured: req.body.isFeatured === "true",
       },
     });
 
     res.json(updated);
   } catch (err) {
- console.error("❌ Error updating article:", err);
+    console.error("❌ Error updating article:", err);
     res.status(500).json({ error: "Update failed", message: err.message });
   }
 };
@@ -148,7 +164,7 @@ exports.deleteArticle = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const article = await prisma.article.findUnique({ where: { id} });
+    const article = await prisma.article.findUnique({ where: { id } });
     if (!article) return res.status(404).json({ error: "Not found" });
 
     // Delete Cloudinary image if it exists
@@ -157,11 +173,10 @@ exports.deleteArticle = async (req, res) => {
       await deleteImageFromCloudinary(publicId);
     }
 
-    await prisma.article.delete({ where: {id} });
+    await prisma.article.delete({ where: { id } });
     res.json({ message: "Article deleted" });
   } catch (err) {
     console.error("❌ Error deleting article:", err);
     res.status(500).json({ error: "Delete failed", message: err.message });
   }
 };
-
