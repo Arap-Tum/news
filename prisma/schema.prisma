@@ -27,7 +27,7 @@ model User {
   
   email     String    @unique
   password  String
-  role      String    @default("author")
+  role      UserRole  @default(USER)
   createdAt DateTime  @default(now())
   articles  Article[]
 }
@@ -71,5 +71,6 @@ model Category {
 model County {
   id        Int    @id @default(autoincrement())
   name      String    @unique   // e.g. Nandi, Uasin Gishu, Nakuru
+  region   String
   articles  Article[]
 }

@@ -9,11 +9,11 @@ exports.register = async (req, res) => {
   const { username, email, password } = req.body;
 
   // Validate required fields
-  if (!username || !email || !password) {
-    return res
-      .status(400)
-      .json({ error: "Username, email, and password are required" });
-  }
+  if (!username) return res.status(400).json({ error: "Username is required" });
+  if (!email) return res.status(400).json({ error: "email isrequired" });
+
+  if (!password)
+    return res.status(400).json({ error: " password is required" });
 
   try {
     // Check if user already exists

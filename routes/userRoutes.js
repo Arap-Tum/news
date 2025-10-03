@@ -1,11 +1,35 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
+const requireAuth = require("../middlewares/authmiddleware.js");
+const requireRole = require("../middlewares/restrictRole.js");
 
-router.post("/", userController.createUser);
-router.get("/", userController.getAllUsers);
+router.get("/", requireAuth, requireRole("ADMIN"), userController.getAllUsers);
+
 router.get("/:id", userController.getUserById);
-router.put("/:id", userController.updateUser);
-router.delete("/:id", userController.deleteUser);
+router.put(
+  "/self",
+  requireAuth,
+  requireRole("USER", "AUTHOR", "EDITOR", "ADMIN"),
+  userController.updateMyProfile
+);
+router.patch(
+  "/:id",
+  requireAuth,
+  requireRole("ADMIN"),
+  userController.updateUserRole
+);
+router.put(
+  "/:id",
+  requireAuth,
+  requireRole("USER", "AUTHOR", "EDITOR", "ADMIN"),
+  userController.updateUser
+);
+router.delete(
+  "/:id",
+  requireAuth,
+  requireRole("ADMIN"),
+  userController.deleteUser
+);
 
 module.exports = router;
