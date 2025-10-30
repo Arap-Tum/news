@@ -66,7 +66,6 @@ exports.updateUser = async (req, res) => {
         email: true,
         role: true, // 👀 still returned, but not updated
         createdAt: true,
-        updatedAt: true,
       }, // 🚫 never return password hash
     });
 
@@ -157,7 +156,6 @@ exports.updateUserRole = async (req, res) => {
         email: true,
         role: true,
         createdAt: true,
-        updatedAt: true,
       },
     });
 

@@ -117,11 +117,14 @@ exports.getAllArticles = async (req, res) => {
 //Read by Author
 exports.getMyArticles = async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;
+
+    // console.log("req.user:", req.user);
 
     const articles = await prisma.article.findMany({
       where: { authorId: userId },
       include: {
+        author: true,
         category: true,
         county: true,
       },
@@ -238,6 +241,7 @@ exports.deleteArticle = async (req, res) => {
 // GET verified articles only
 exports.getVerifiedArticles = async (req, res) => {
   try {
+    // console.log("you are in ");
     const articles = await prisma.article.findMany({
       where: {
         verificationStatus: "APPROVED", // adjust enum if different
@@ -249,11 +253,15 @@ exports.getVerifiedArticles = async (req, res) => {
         verifiedAt: "desc", // newest verified first
       },
       include: {
-        author: true,
+        author: {
+          select: { name: true, role: true },
+        },
         category: true,
         county: true,
       },
     });
+
+    //console.log(articles);
 
     res.json(articles);
   } catch (error) {
@@ -303,5 +311,21 @@ exports.verifyArticle = async (req, res) => {
     res
       .status(500)
       .json({ error: "Verification failed", message: err.message });
+  }
+};
+
+//GET ARTICLE BY SLUG
+exports.getArticleBySlug = async (req, res) => {
+  const { slug } = req.params;
+  try {
+    const article = await prisma.article.findUnique({
+      where: { slug },
+      include: { author: true, category: true, county: true },
+    });
+    if (!article) return res.status(404).json({ error: "Not found" });
+    res.json(article);
+  } catch (error) {
+    console.log("Error fetching articles ", error);
+    res.status(500).json({ error: "Error retrieving article" });
   }
 };

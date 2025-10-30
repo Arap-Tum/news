@@ -44,25 +44,41 @@ app.use("/api/services", serviceRoute);
  Proxy endpoint  to nes API 
 */
 //==========================================
+// app.get("/api/news", async (req, res) => {
+//   try {
+
+//     const response = await fetch(
+//       `https://newsapi.org/v2/top-headlines?country=us&apiKey=${process.env.NEWS_API_KEY}`
+//     );
+
+//     if (!response.ok) {
+//       throw new Error(`News API error: ${response.statusText}`);
+//     }
+
+//     const data = await response.json();
+//     res.json(data);
+//   } catch (error) {
+//     console.error("Error fetching news:", error);
+//     res.status(500).json({ error: "Failed to fetch news" });
+//   }
+// });
+
 app.get("/api/news", async (req, res) => {
   try {
-    // console.log("Fetch is:", typeof fetch); // <-- check
-
     const response = await fetch(
-      `https://newsapi.org/v2/top-headlines?country=us&apiKey=${process.env.NEWS_API_KEY}`
+      `https://newsapi.org/v2/top-headlines?language=en&category=politics&apiKey=${process.env.NEWS_API_KEY}`
     );
 
-    if (!response.ok) {
-      throw new Error(`News API error: ${response.statusText}`);
-    }
-
     const data = await response.json();
+
+    // ✅ Make sure this line sends back the entire object (including .articles)
     res.json(data);
   } catch (error) {
     console.error("Error fetching news:", error);
     res.status(500).json({ error: "Failed to fetch news" });
   }
 });
+
 //============================================
 
 app.get("/", (req, res) => {

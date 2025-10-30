@@ -14,6 +14,7 @@ const {
   getMyArticles,
   getVerifiedArticles,
   verifyArticle,
+  getArticleBySlug,
 } = require("../controllers/articleController.js");
 
 // ✅ New route to get logged-in user's articles
@@ -28,7 +29,9 @@ router.post(
 );
 router.get("/", requireAuth, requireRole("ADMIN"), getAllArticles);
 router.get("/verified", getVerifiedArticles);
-router.patch("/verify", requireAuth, requireRole("ADMIN"), verifyArticle);
+
+router.get("/:slug", getArticleBySlug);
+router.patch("/verify/:id", requireAuth, requireRole("ADMIN"), verifyArticle);
 router.get("/:id", getArticleById);
 router.put("/:id", requireAuth, upload.single("image"), updateArticle);
 router.delete("/:id", requireAuth, deleteArticle);
